@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Codilight</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0a0e27',
+                            800: '#151931',
+                            700: '#1f2937',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-900 text-white">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-dark-800 border-r border-white/10 p-6 flex flex-col">
+            <a href="/admin/dashboard" class="flex items-center gap-2 mb-8 hover:opacity-80 transition">
+                <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Codilight" class="h-8 w-auto" onerror="this.style.display='none'">
+                <span class="font-bold text-lg">CodiLight</span>
+            </a>
+            
+            <nav class="flex-1 space-y-2">
+                <a href="/admin/dashboard" class="block px-4 py-3 bg-blue-500/20 text-blue-300 rounded-lg font-semibold">
+                    <i class="fas fa-chart-bar mr-3"></i> Dashboard
+                </a>
+                <a href="#" class="block px-4 py-3 hover:bg-dark-700 rounded-lg transition">
+                    <i class="fas fa-file-export mr-3"></i> Export Leads
+                </a>
+                
+                <a href="/admin/portfolio" class="block px-4 py-3 hover:bg-dark-700 rounded-lg transition">
+                    <i class="fas fa-briefcase mr-3"></i> Portfolio
+                </a>
+                <a href="/admin/testimonials" class="block px-4 py-3 hover:bg-dark-700 rounded-lg transition">
+                    <i class="fas fa-comment-dots mr-3"></i> Testimonials
+                </a>
+            </nav>
+            
+            <div class="border-t border-white/10 pt-6">
+                <a href="/admin/logout" class="block px-4 py-3 text-red-400 hover:bg-red-500/20 rounded-lg transition">
+                    <i class="fas fa-sign-out-alt mr-3"></i> Logout
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Header -->
+            <div class="bg-dark-800 border-b border-white/10 px-8 py-6">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-3xl font-bold">Lead Management System</h1>
+                    <div class="text-sm text-gray-400">
+                        <i class="fas fa-user-circle mr-2"></i> Admin
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-8">
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-dark-800 border border-white/10 rounded-lg p-6">
+                        <p class="text-gray-400 text-sm mb-2">Total Leads</p>
+                        <p class="text-4xl font-bold">{{ stats.total }}</p>
+                    </div>
+                    <div class="bg-dark-800 border border-white/10 rounded-lg p-6">
+                        <p class="text-gray-400 text-sm mb-2">New Leads</p>
+                        <p class="text-4xl font-bold text-blue-400">{{ stats.new }}</p>
+                    </div>
+                    <div class="bg-dark-800 border border-white/10 rounded-lg p-6">
+                        <p class="text-gray-400 text-sm mb-2">Contacted</p>
+                        <p class="text-4xl font-bold text-yellow-400">{{ stats.contacted }}</p>
+                    </div>
+                    <div class="bg-dark-800 border border-white/10 rounded-lg p-6">
+                        <p class="text-gray-400 text-sm mb-2">Converted</p>
+                        <p class="text-4xl font-bold text-green-400">{{ stats.converted }}</p>
+                    </div>
+                </div>
+                
+                <!-- Filters and Search -->
+                <div class="bg-dark-800 border border-white/10 rounded-lg p-6 mb-8">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <!-- Search -->
+                        <div class="flex-1">
+                            <form method="GET" class="flex gap-2">
+                                <input type="text" name="search" placeholder="Search leads..." value="{{ search }}"
+                                       class="flex-1 bg-dark-900/50 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500/50 transition text-white placeholder-gray-500">
+                                <button type="submit" class="bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded-lg font-semibold transition">
+                                    Search
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Status Filter -->
+                        <form method="GET" class="flex gap-2">
+                            <select name="status" onchange="this.form.submit()" value="{{ status_filter }}"
+                                    class="bg-dark-900/50 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500/50 transition text-white">
+                                <option value="all">All Status</option>
+                                <option value="new" {% if status_filter == 'new' %}selected{% endif %}>New</option>
+                                <option value="contacted" {% if status_filter == 'contacted' %}selected{% endif %}>Contacted</option>
+                                <option value="qualified" {% if status_filter == 'qualified' %}selected{% endif %}>Qualified</option>
+                                <option value="converted" {% if status_filter == 'converted' %}selected{% endif %}>Converted</option>
+                                <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+                            </select>
+                        </form>
+                        
+                        <!-- Export -->
+                        <a href="/admin/api/leads/export" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-lg font-semibold transition">
+                            <i class="fas fa-download mr-2"></i> Export CSV
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Leads Table -->
+                <div class="bg-dark-800 border border-white/10 rounded-lg overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-dark-700 border-b border-white/10">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Name</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Email</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Phone</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Company</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Status</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Created</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if leads %}
+                                {% for lead in leads %}
+                                <tr class="border-b border-white/10 hover:bg-dark-700/50 transition">
+                                    <td class="px-6 py-4">{{ lead.name }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-300">{{ lead.email }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-300">{{ lead.phone }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-300">{{ lead.company or '-' }}</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold {% if lead.status == 'new' %}bg-blue-500/20 text-blue-300{% elif lead.status == 'contacted' %}bg-yellow-500/20 text-yellow-300{% elif lead.status == 'qualified' %}bg-purple-500/20 text-purple-300{% elif lead.status == 'converted' %}bg-green-500/20 text-green-300{% else %}bg-red-500/20 text-red-300{% endif %}">
+                                            {{ lead.status }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-400">{{ lead.created_at.strftime('%Y-%m-%d') }}</td>
+                                    <td class="px-6 py-4">
+                                        <a href="/admin/leads/{{ lead.id }}" class="text-blue-400 hover:text-blue-300 transition text-sm font-medium">
+                                            View Details
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="px-6 py-12 text-center text-gray-400">
+                                        No leads found
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                {% if pagination.pages > 1 %}
+                <div class="mt-8 flex justify-center items-center gap-2">
+                    {% if pagination.has_prev %}
+                    <a href="{{ url_for('admin_dashboard', page=pagination.prev_num, status=status_filter, search=search) }}" 
+                       class="px-4 py-2 bg-dark-800 border border-white/10 rounded-lg hover:border-blue-500/50 transition">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    {% endif %}
+                    
+                    {% for page_num in pagination.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num == pagination.page %}
+                            <span class="px-4 py-2 bg-blue-500 rounded-lg font-semibold">{{ page_num }}</span>
+                            {% else %}
+                            <a href="{{ url_for('admin_dashboard', page=page_num, status=status_filter, search=search) }}" 
+                               class="px-4 py-2 bg-dark-800 border border-white/10 rounded-lg hover:border-blue-500/50 transition">
+                                {{ page_num }}
+                            </a>
+                            {% endif %}
+                        {% else %}
+                        <span class="px-4 py-2">...</span>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if pagination.has_next %}
+                    <a href="{{ url_for('admin_dashboard', page=pagination.next_num, status=status_filter, search=search) }}" 
+                       class="px-4 py-2 bg-dark-800 border border-white/10 rounded-lg hover:border-blue-500/50 transition">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

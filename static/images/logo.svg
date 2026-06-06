@@ -1,0 +1,13 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Left Dark Blue Triangle -->
+  <polygon points="20,30 10,60 20,90" fill="#001F52"/>
+  
+  <!-- Center Light Blue Triangle -->
+  <polygon points="20,30 50,60 20,90" fill="#0066CC"/>
+  
+  <!-- Right Cyan Triangle -->
+  <polygon points="50,30 100,60 50,90" fill="#00CCFF"/>
+  
+  <!-- White Divider Line -->
+  <line x1="30" y1="30" x2="30" y2="90" stroke="white" stroke-width="2.5" opacity="0.8"/>
+</svg>
