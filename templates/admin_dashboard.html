@@ -32,17 +32,17 @@
             </a>
             
             <nav class="flex-1 space-y-2">
-                <a href="/admin/dashboard" class="block px-4 py-3 bg-blue-500/20 text-blue-300 rounded-lg font-semibold">
+                <a href="/admin/dashboard" class="block px-4 py-3 rounded-lg transition {% if request.path.startswith('/admin/dashboard') %}bg-blue-500/20 text-blue-300 font-semibold{% else %}hover:bg-dark-700{% endif %}">
                     <i class="fas fa-chart-bar mr-3"></i> Dashboard
                 </a>
-                <a href="#" class="block px-4 py-3 hover:bg-dark-700 rounded-lg transition">
+                <a href="#" class="block px-4 py-3 rounded-lg transition hover:bg-dark-700">
                     <i class="fas fa-file-export mr-3"></i> Export Leads
                 </a>
-                
-                <a href="/admin/portfolio" class="block px-4 py-3 hover:bg-dark-700 rounded-lg transition">
+
+                <a href="/admin/portfolio" class="block px-4 py-3 rounded-lg transition {% if request.path.startswith('/admin/portfolio') %}bg-blue-500/20 text-blue-300 font-semibold{% else %}hover:bg-dark-700{% endif %}">
                     <i class="fas fa-briefcase mr-3"></i> Portfolio
                 </a>
-                <a href="/admin/testimonials" class="block px-4 py-3 hover:bg-dark-700 rounded-lg transition">
+                <a href="/admin/testimonials" class="block px-4 py-3 rounded-lg transition {% if request.path.startswith('/admin/testimonials') %}bg-blue-500/20 text-blue-300 font-semibold{% else %}hover:bg-dark-700{% endif %}">
                     <i class="fas fa-comment-dots mr-3"></i> Testimonials
                 </a>
             </nav>

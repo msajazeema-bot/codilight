@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeServiceCardAnimations();
     initializeServiceCardExpand();
     initializeHeroMockups();
+    initializeNavActiveLinks();
 });
 
 // =====================================================
@@ -398,6 +399,78 @@ function validateField(field) {
     }
     
     return isValid;
+}
+
+
+// =====================================================
+// NAV LINK ACTIVE STATE FOR SECTION ANCHORS
+// Highlights desktop/mobile nav links when their target section is visible
+// =====================================================
+function initializeNavActiveLinks() {
+    const navLinks = document.querySelectorAll('#navbar a[href^="#"], #mobile-menu a[href^="#"], .hidden.md\\:flex a[href^="#"]');
+    const homeLinks = document.querySelectorAll('#navbar a[href="/"], #mobile-menu a[href="/"]');
+
+    if ((!navLinks || navLinks.length === 0) && (!homeLinks || homeLinks.length === 0)) return;
+
+    const idToLink = {};
+    navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (!href || !href.startsWith('#')) return;
+        const id = href.slice(1);
+        idToLink[id] = idToLink[id] || [];
+        idToLink[id].push(link);
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const id = entry.target.id;
+            const links = idToLink[id] || [];
+            if (entry.isIntersecting) {
+                // clear all section link active states
+                Object.values(idToLink).flat().forEach(l => l.classList.remove('text-primary-400', 'font-semibold'));
+                // unset home when a section becomes active
+                homeLinks.forEach(h => h.classList.remove('text-primary-400', 'font-semibold'));
+                links.forEach(l => l.classList.add('text-primary-400', 'font-semibold'));
+            }
+        });
+    }, { root: null, threshold: 0.5 });
+
+    // Observe only sections that map to nav anchors
+    Object.keys(idToLink).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
+    });
+
+    // When no hash / at top, make Home active (only on homepage)
+    function setHomeIfTop() {
+        const nearTop = window.scrollY < 120;
+        if (location.pathname === '/' && nearTop) {
+            // clear section links
+            Object.values(idToLink).flat().forEach(l => l.classList.remove('text-primary-400', 'font-semibold'));
+            homeLinks.forEach(h => h.classList.add('text-primary-400', 'font-semibold'));
+        } else {
+            homeLinks.forEach(h => h.classList.remove('text-primary-400', 'font-semibold'));
+        }
+    }
+
+    // Also handle hashchange and initial hash
+    function handleHash() {
+        const hash = (location.hash || '').replace('#', '');
+        if (!hash) {
+            setHomeIfTop();
+            return;
+        }
+        // remove existing active
+        Object.values(idToLink).flat().forEach(l => l.classList.remove('text-primary-400', 'font-semibold'));
+        homeLinks.forEach(h => h.classList.remove('text-primary-400', 'font-semibold'));
+        const links = idToLink[hash] || [];
+        links.forEach(l => l.classList.add('text-primary-400', 'font-semibold'));
+    }
+
+    window.addEventListener('hashchange', handleHash);
+    window.addEventListener('scroll', setHomeIfTop);
+    // initial
+    handleHash();
 }
 
 // =====================================================
