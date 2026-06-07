@@ -51,6 +51,24 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# ==================== Domain Redirect ====================
+
+@app.before_request
+def redirect_to_www():
+    """Redirect bare domain (codilight.com) to www.codilight.com.
+
+    register.lk does not support CNAME records at the apex, so the root
+    domain is pointed at Railway via an A record while the www subdomain
+    uses a CNAME.  This handler ensures visitors who land on the bare
+    domain are transparently forwarded to the canonical www address,
+    preserving the full path and query string.
+    """
+    host = request.host.split(':')[0]  # strip port if present
+    if host == 'codilight.com':
+        target = request.url.replace('://codilight.com', '://www.codilight.com', 1)
+        return redirect(target, code=301)
+
+
 # ==================== Main Website Routes ====================
 
 @app.route('/')
