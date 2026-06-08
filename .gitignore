@@ -119,3 +119,9 @@ dmypy.json
 !database/
 !static/
 !templates/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
